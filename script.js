@@ -2,12 +2,14 @@ var canvas = document.getElementById('myCanvas');
 var ctx = canvas.getContext('2d');
 
 var x = canvas.width/2;
-var y = canvas.height - 30;
+var y = canvas.height - 100;
 var dx = 2;
 var dy = -2;
 var ballRadius = 30;
-var paddleHeight = 10;
-var paddleWidth = 75;
+var ballHeight = 100;
+var ballWidth = 100;
+var paddleHeight = 25;
+var paddleWidth = 100;
 var paddleX = (canvas.width-paddleWidth)/2;
 var rightPressed = false;
 var leftPressed = false;
@@ -65,10 +67,9 @@ function keyUpHandler(e) {
 	}
 }
 
-function drawBall() {
-	
+function drawBall() {	
     var image = document.getElementById('cat');    
-    ctx.drawImage(image, x, y, 100, 100);
+    ctx.drawImage(image, x, y, ballHeight, ballWidth);
 }
 
 function drawPaddle() {
@@ -84,17 +85,16 @@ function collisionDetection() {
 		for(r=0; r<brickRowCount; r++){
 			var b = bricks[c][r];
 			if(b.status  == 1) {
-				if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+				if(x+(ballWidth/2) > b.x && x+(ballWidth/2) < b.x+brickWidth && y+(ballHeight/2) > b.y && y+(ballHeight/2) < b.y+brickHeight) {
 					dy = -dy;
-                    var image = document.getElementById('cat');                    
-                    image.src = "cat-happy.png";                    
+                    drawHappyCat();                  
 					b.status = 0;
 					score++;
 					if(score == brickRowCount*brickColumnCount) {
 						alert("YOU WIN!");
 						document.location.reload();
 					}
-				}                
+				}
 			}
 		}
 	}
@@ -113,7 +113,7 @@ function drawLives() {
 }
 
 function draw() {
-	ctx.clearRect(0,0, canvas.width, canvas.height);        
+	ctx.clearRect(0,0, canvas.width, canvas.height);            
 	drawBricks()
 	drawBall();
 	drawPaddle();
@@ -121,28 +121,34 @@ function draw() {
 	drawLives();
 	collisionDetection();
 
-	if(y + dy < ballRadius) {
+	if(y + dy < ballWidth / 2) {
 		dy = -dy;
-	} else if (y + dy > canvas.height-ballRadius) {
-		if(x > paddleX && x < paddleX + paddleWidth) {
+	} else if (y + dy > canvas.height-ballHeight) {
+		if(x + (ballWidth/2) > paddleX && x + (ballWidth/2) < paddleX + paddleWidth) {
 			dy = -dy;
-            var image = document.getElementById('cat');                    
-            image.src = "cat.png";
+            drawCat();                                                       
 		} else {
-			lives--;
-			if(!lives) {
-				alert("GAME OVER!");
+			lives--;                 
+			if(!lives) {   
+                drawXCat();
+                // to do!!!                
+				alert("GAME OVER!");                
+                drawXCat();
 				document.location.reload();
 			} else {
 				x = canvas.width/2;
-				y = canvas.height-30;
+				y = canvas.height-100;
 				dx = 2;
 				dy = -2;
 				paddleX = (canvas.width-paddleWidth)/2;
+                drawCat();
 			}
 		}
 	}
-	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+	/*if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+		dx = -dx;
+	}*/
+    if(x + dx > canvas.width-ballWidth || x + dx < ballWidth) {
 		dx = -dx;
 	}
 
@@ -155,6 +161,7 @@ function draw() {
 
 	x += dx;
 	y += dy;
+    
 	requestAnimationFrame(draw);
 }
 
@@ -167,4 +174,20 @@ function mouseMoveHandler(e) {
 	}
 }
 
+function drawCat() {
+    var image = document.getElementById('cat');                    
+    image.src = "cat.png";
+}
+
+function drawHappyCat() {
+    var image = document.getElementById('cat');                    
+    image.src = "cat-happy.png"   
+}
+
+function drawXCat() {
+    var image = document.getElementById('cat');                    
+    image.src = "cat-dead.png";    
+}
+
+drawCat(); 
 draw();
